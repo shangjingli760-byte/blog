@@ -1,0 +1,120 @@
+<!-- 页面增强动画脚本 -->
+{{/* 浮动装饰光斑 */}}
+<div class="floating-orb"></div>
+<div class="floating-orb"></div>
+<div class="floating-orb"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  // ===== 1. 滚动揭示动画 (Intersection Observer) =====
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  // 文章列表卡片
+  document.querySelectorAll('article.mt-6, .prose > *').forEach(function(el){
+    el.classList.add('reveal-on-scroll');
+    observer.observe(el);
+  });
+
+  // ===== 2. 3D 卡片悬浮效果 =====
+  document.querySelectorAll('.animate-card').forEach(function(card){
+    card.addEventListener('mousemove', function(e){
+      var rect = card.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      var centerX = rect.width / 2;
+      var centerY = rect.height / 2;
+      var rotateX = (y - centerY) / centerY * -5;
+      var rotateY = (x - centerX) / centerX * 5;
+      card.style.transform = 'perspective(1000px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-4px)';
+    });
+    card.addEventListener('mouseleave', function(){
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+    });
+  });
+
+  // ===== 3. 打字机效果(页面副标题) =====
+  var heroSub = document.querySelector('.homepage-headline, [class*="headline"]');
+  if (heroSub) {
+    var text = heroSub.textContent.trim();
+    heroSub.textContent = '';
+    heroSub.classList.add('typewriter-cursor');
+    var i = 0;
+    function typeWriter(){
+      if (i < text.length) {
+        heroSub.textContent += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, 60 + Math.random() * 40);
+      }
+    }
+    setTimeout(typeWriter, 500);
+  }
+
+  // ===== 4. 视差滚动(背景光斑) =====
+  var orbs = document.querySelectorAll('.floating-orb');
+  if (orbs.length && window.innerWidth > 768) {
+    window.addEventListener('scroll', function(){
+      var scrollY = window.scrollY;
+      var vh = window.innerHeight;
+      orbs.forEach(function(orb, idx){
+        var speed = 0.03 + idx * 0.01;
+        var yOffset = scrollY * speed;
+        orb.style.transform = 'translateY(' + yOffset + 'px)';
+      });
+    }, { passive: true });
+  }
+
+  // ===== 5. 平滑页面过渡 =====
+  // 为所有内部链接添加平滑过渡(已由 scroll-smooth 处理)
+  // 添加离开动画
+  document.querySelectorAll('a[href^="/"]').forEach(function(link){
+    link.addEventListener('click', function(e){
+      if (e.metaKey || e.ctrlKey || link.target === '_blank') return;
+      if (link.getAttribute('href').startsWith('#')) return;
+      e.preventDefault();
+      document.body.style.opacity = '0';
+      document.body.style.transform = 'translateY(-8px)';
+      document.body.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      setTimeout(function(){
+        window.location = link.href;
+      }, 250);
+    });
+  });
+
+  // ===== 6. 回到顶部平滑滚动 =====
+  document.querySelectorAll('[href="#top"], [href="#"]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // ===== 7. 页面回退时恢复透明度 =====
+  window.addEventListener('pageshow', function(e){
+    if (e.persisted) {
+      document.body.style.opacity = '1';
+      document.body.style.transform = 'none';
+    }
+  });
+
+  // ===== 8. 为第一屏可见元素立即显示 =====
+  setTimeout(function(){
+    document.querySelectorAll('.reveal-on-scroll').forEach(function(el){
+      var rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('revealed');
+        observer.unobserve(el);
+      }
+    });
+  }, 100);
+
+})();
+</script>
