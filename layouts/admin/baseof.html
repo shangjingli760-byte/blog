@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}" class="scroll-smooth">
+  <head>
+    {{ partial "head.html" . }}
+    <link rel="stylesheet" href="{{ "css/admin.css" | relURL }}">
+    <script>
+      window.ADMIN_CONFIG = {
+        apiBase: 'http://localhost:8080',
+        pageType: '{{ .Params.adminType | default "dashboard" }}'
+      };
+    </script>
+  </head>
+  <body class="{{ if eq .Params.adminType "login" }}h-screen{{ else }}flex flex-col min-h-screen bg-white dark:bg-neutral-900{{ end }} text-base font-normal text-neutral-700 dark:text-neutral-300">
+    {{ if ne .Params.adminType "login" }}
+    <header class="border-b border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
+      <div class="flex items-center justify-between px-6 py-3">
+        <a href="{{ "admin" | relURL }}" class="text-lg font-bold text-primary-600 dark:text-primary-400">
+          {{ .Site.Title }} · 管理
+        </a>
+        <div class="flex items-center gap-4">
+          <a href="{{ "/" | relURL }}" class="text-sm text-neutral-500 hover:text-primary-600 dark:hover:text-primary-400" target="_blank">查看前台 →</a>
+          <button id="btn-logout" class="text-sm text-neutral-500 hover:text-red-500 hidden" onclick="adminLogout()">退出</button>
+        </div>
+      </div>
+    </header>
+    {{ end }}
+    {{ if eq .Params.adminType "login" }}
+      <main>{{ block "admin_content" . }}{{ .Content }}{{ end }}</main>
+    {{ else }}
+    <div class="flex flex-1">
+      <aside class="w-56 min-h-full border-r border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 flex-shrink-0 hidden md:block">
+        <nav id="admin-nav" class="p-4 space-y-1 text-sm">
+          <a href="{{ "admin" | relURL }}" class="admin-nav-item flex items-center gap-2 rounded-lg px-3 py-2 text-neutral-600 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700">
+            <span class="text-lg">📊</span> 概览
+          </a>
+          <a href="{{ "admin/articles" | relURL }}" class="admin-nav-item flex items-center gap-2 rounded-lg px-3 py-2 text-neutral-600 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700">
+            <span class="text-lg">📝</span> 文章管理
+          </a>
+          <a href="{{ "admin/comments" | relURL }}" class="admin-nav-item flex items-center gap-2 rounded-lg px-3 py-2 text-neutral-600 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700">
+            <span class="text-lg">💬</span> 评论管理
+          </a>
+        </nav>
+        <script>
+          (function(){
+            var path = window.location.pathname.replace(/\/$/, '');
+            document.querySelectorAll('.admin-nav-item').forEach(function(el){
+              var href = el.getAttribute('href').replace(/\/$/, '');
+              if (path === href || (path.startsWith(href) && href !== '/admin')) {
+                el.classList.add('bg-primary-100','dark:bg-primary-900/30','text-primary-700','dark:text-primary-400','font-medium');
+              }
+            });
+          })();
+        </script>
+      </aside>
+      <main class="flex-1 p-6 md:p-8">
+        {{ template "admin_content" . }}
+      </main>
+    </div>
+    {{ end }}
+    <script src="{{ "js/admin/admin-api.js" | relURL }}"></script>
+    {{ if ne .Params.adminType "login" }}
+    <script src="{{ "js/admin/admin-auth.js" | relURL }}"></script>
+    {{ end }}
+  </body>
+</html>

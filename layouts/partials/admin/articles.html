@@ -1,0 +1,57 @@
+<div class="flex items-center justify-between mb-6">
+  <h2 class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">文章管理</h2>
+  <button id="btn-new-article" class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors">+ 新建文章</button>
+</div>
+<div id="tags-bar" class="mb-4 flex flex-wrap gap-2"></div>
+<div id="article-msg" class="mb-4 hidden rounded-lg px-4 py-3 text-sm"></div>
+<div id="article-editor" class="mb-6 hidden rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+  <h3 id="editor-title" class="mb-4 text-lg font-semibold text-neutral-800 dark:text-neutral-100">新建文章</h3>
+  <form class="space-y-4" onsubmit="return false;">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">标题 *</label>
+        <input type="text" id="art-title" class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200" placeholder="文章标题" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Slug *</label>
+        <input type="text" id="art-slug" class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200" placeholder="url-friendly-slug" />
+      </div>
+    </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">摘要</label>
+        <input type="text" id="art-summary" class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200" placeholder="简短描述" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">标签（逗号分隔）</label>
+        <input type="text" id="art-tags" class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200" placeholder="技术, 生活" />
+      </div>
+    </div>
+    <div>
+      <label class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Markdown 内容 *</label>
+      <textarea id="art-content" rows="18" class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 font-mono text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200" placeholder="# 标题&#10;&#10;正文内容..."></textarea>
+    </div>
+    <div class="flex gap-3">
+      <button type="button" id="btn-save-article" class="rounded-lg bg-primary-600 px-6 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50 transition-colors">发布文章</button>
+      <button type="button" id="btn-cancel-editor" class="rounded-lg bg-neutral-100 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 transition-colors">取消</button>
+    </div>
+  </form>
+</div>
+<div id="articles-loading" class="py-12 text-center text-neutral-400">
+  <div class="mx-auto mb-3 h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500"></div>加载中...  
+</div>
+<div id="articles-table" class="hidden overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+  <table class="w-full text-sm">
+    <thead class="bg-neutral-50 text-left text-neutral-500 dark:bg-neutral-800">
+      <tr>
+        <th class="px-4 py-3 font-medium">标题</th>
+        <th class="px-4 py-3 font-medium hidden sm:table-cell">标签</th>
+        <th class="px-4 py-3 font-medium hidden md:table-cell">日期</th>
+        <th class="px-4 py-3 font-medium text-right">操作</th>
+      </tr>
+    </thead>
+    <tbody id="articles-tbody" class="divide-y divide-neutral-100 dark:divide-neutral-700"></tbody>
+  </table>
+</div>
+<div id="articles-empty" class="hidden rounded-xl border border-neutral-200 bg-white p-12 text-center text-neutral-400 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">还没有文章，点击上方按钮创建第一篇。</div>
+<script src="{{ "js/admin/articles.js" | relURL }}"></script>

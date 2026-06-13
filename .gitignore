@@ -3,12 +3,16 @@ blog-hugo/public/
 blog-hugo/resources/_gen/
 blog-hugo/.hugo_build.lock
 
+# Hugo cache
+.hugo_build.lock
+
 # Next.js build
 blog-web/.next/
 blog-web/out/
 
 # Node modules
 blog-web/node_modules/
+node_modules/
 
 # Go build
 blog-server/*.exe
