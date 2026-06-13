@@ -1,0 +1,25 @@
+<h2 class="mb-6 text-2xl font-bold text-neutral-800 dark:text-neutral-100">概览</h2>
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" id="dashboard-cards">
+  <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 cursor-pointer hover:shadow-md transition-shadow" onclick="location.href='{{ "admin/articles" | relURL }}'">
+    <div class="text-3xl mb-2">📝</div>
+    <div class="text-3xl font-bold text-primary-600 dark:text-primary-400" id="stat-articles">-</div>
+    <div class="mt-1 text-sm text-neutral-500">文章总数</div>
+  </div>
+  <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 cursor-pointer hover:shadow-md transition-shadow" onclick="location.href='{{ "admin/comments" | relURL }}'">
+    <div class="text-3xl mb-2">💬</div>
+    <div class="text-3xl font-bold text-green-600 dark:text-green-400" id="stat-comments">-</div>
+    <div class="mt-1 text-sm text-neutral-500">评论总数</div>
+  </div>
+  <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 cursor-pointer hover:shadow-md transition-shadow" onclick="location.href='{{ "admin/articles" | relURL }}?action=new'">
+    <div class="text-3xl mb-2">➕</div>
+    <div class="text-lg font-bold text-neutral-700 dark:text-neutral-300">新建文章</div>
+    <div class="mt-1 text-sm text-neutral-500">导入 Markdown 文档</div>
+  </div>
+</div>
+<script>
+(function(){
+  var api = AdminAPI.apiBase;
+  fetch(api + '/api/articles').then(function(r){return r.json()}).then(function(r){ document.getElementById('stat-articles').textContent = r.data ? r.data.length : 0; }).catch(function(){});
+  AdminAPI.authGet('/api/admin/comments').then(function(r){ document.getElementById('stat-comments').textContent = r.data ? r.data.length : 0; }).catch(function(){});
+})();
+</script>

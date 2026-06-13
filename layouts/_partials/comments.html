@@ -1,0 +1,60 @@
+<!-- 博客评论组件 - 接入 Go 后端 API -->
+<div id="blog-comments" class="blog-comments">
+  <!-- 评论列表容器 -->
+  <h3 class="flex items-center text-xl font-semibold">
+    <span>留言</span>
+    <span id="comments-count" class="ml-2 text-base font-normal text-neutral-500"></span>
+  </h3>
+
+  <!-- 评论列表 -->
+  <div id="comments-list" class="mt-6 space-y-4"></div>
+
+  <!-- 加载状态 -->
+  <div id="comments-loading" class="py-8 text-center text-neutral-400">
+    <div class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500"></div>
+    <span class="ml-2">加载评论中...</span>
+  </div>
+
+  <!-- 评论表单 -->
+  <div class="mt-8 border-t border-neutral-200 pt-8 dark:border-neutral-700">
+    <h4 class="text-lg font-semibold mb-4">发表留言</h4>
+    <form id="comment-form" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-neutral-600 dark:text-neutral-400 mb-1">昵称 <span class="text-red-500">*</span></label>
+          <input
+            type="text" id="comment-nickname" required
+            class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200"
+            placeholder="你的昵称"
+          />
+        </div>
+        <div>
+          <label class="block text-sm text-neutral-600 dark:text-neutral-400 mb-1">邮箱 <span class="text-red-500">*</span></label>
+          <input
+            type="email" id="comment-email" required
+            class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200"
+            placeholder="your@email.com"
+          />
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm text-neutral-600 dark:text-neutral-400 mb-1">内容 <span class="text-red-500">*</span></label>
+        <textarea
+          id="comment-content" required rows="4"
+          class="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200"
+          placeholder="想说点什么..."
+        ></textarea>
+      </div>
+      <div id="comment-message"></div>
+      <button
+        type="submit" id="comment-submit"
+        class="inline-flex items-center rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-300 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+      >
+        发布留言
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- 评论脚本 -->
+<script src="{{ "js/comments.js" | relURL }}"></script>
