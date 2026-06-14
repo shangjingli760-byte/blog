@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Setup(logger *zap.Logger, articleSvc *service.ArticleService, commentSvc *service.CommentService, db *gorm.DB) *gin.Engine {
+func Setup(logger *zap.Logger, articleSvc *service.ArticleService, commentSvc *service.CommentService, tombSvc *service.TombService, db *gorm.DB) *gin.Engine {
 	r := gin.New()
 
 	// 全局中间件
@@ -31,6 +31,18 @@ func Setup(logger *zap.Logger, articleSvc *service.ArticleService, commentSvc *s
 	commentH := handler.NewCommentHandler(commentSvc, articleSvc, logger)
 	r.GET("/api/articles/:slug/comments", commentH.List)
 	r.POST("/api/articles/:slug/comments", commentH.Create)
+
+	// === 赛博墓碑 API ===
+	tombH := handler.NewTombHandler(tombSvc, logger)
+	r.GET("/api/tombs", tombH.List)
+	r.GET("/api/tombs/:id", tombH.Detail)
+	r.POST("/api/tombs", tombH.Create)
+	r.DELETE("/api/tombs/:id", tombH.Delete)
+	r.GET("/api/tombs/:id/visits", tombH.ListVisits)
+	r.POST("/api/tombs/:id/visits", tombH.CreateVisit)
+	r.POST("/api/tombs/:id/visitors", tombH.RecordVisitor)
+	r.GET("/api/tombs/:id/visitors", tombH.ListVisitors)
+	r.GET("/api/tombs/:id/stats", tombH.Stats)
 
 	// === 管理端 API（需要 JWT 认证）===
 	adminH := handler.NewAdminHandler(articleSvc, commentSvc, db, logger)

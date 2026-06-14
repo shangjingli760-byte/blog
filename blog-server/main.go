@@ -39,18 +39,20 @@ func main() {
 	}
 
 	// 自动迁移表结构
-	if err := db.AutoMigrate(&model.Article{}, &model.Comment{}); err != nil {
+	if err := db.AutoMigrate(&model.Article{}, &model.Comment{}, &model.Tomb{}, &model.TombVisit{}, &model.TombVisitor{}); err != nil {
 		logger.Fatal("数据库迁移失败", zap.Error(err))
 	}
 
 	// 初始化依赖（构造函数注入）
 	articleRepo := repository.NewArticleRepository(db)
 	commentRepo := repository.NewCommentRepository(db)
+	tombRepo := repository.NewTombRepository(db)
 	articleSvc := service.NewArticleService(articleRepo)
 	commentSvc := service.NewCommentService(commentRepo)
+	tombSvc := service.NewTombService(tombRepo)
 
 	// 启动服务
-	r := router.Setup(logger, articleSvc, commentSvc, db)
+	r := router.Setup(logger, articleSvc, commentSvc, tombSvc, db)
 	addr := fmt.Sprintf(":%s", cfg.Port)
 	logger.Info("服务启动", zap.String("addr", addr))
 	if err := r.Run(addr); err != nil {
