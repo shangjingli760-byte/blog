@@ -1,0 +1,87 @@
+<head>
+  <meta charset="utf-8" />
+  {{ with .Site.Language.Params.htmlCode | default .Site.LanguageCode }}
+    <meta http-equiv="content-language" content="{{ . }}" />
+  {{ end }}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  {{/* Title */}}
+  {{ if .IsHome }}
+    <title>{{ .Site.Title }}</title>
+  {{ else }}
+    <title>{{ .Title }} | {{ .Site.Title }}</title>
+  {{ end }}
+  {{/* Description */}}
+  {{ with .Params.summary | default (.Summary | default .Site.Params.description) }}
+    <meta name="description" content="{{ . }}" />
+  {{ end }}
+  {{/* OpenGraph */}}
+  {{ template "_internal/opengraph.html" . }}
+  {{/* Twitter */}}
+  {{ template "_internal/twitter_cards.html" . }}
+  {{/* Styles */}}
+  {{ $styles := resources.Get "css/compiled/main.css" }}
+  {{ if $styles }}
+    {{ if hugo.IsProduction }}
+      {{ $styles = $styles | minify | fingerprint }}
+    {{ end }}
+    <link rel="stylesheet" href="{{ $styles.RelPermalink }}" {{ if hugo.IsProduction }}integrity="{{ $styles.Data.Integrity }}"{{ end }} />
+  {{ else }}
+    {{ warnf "Main CSS stylesheet not found at assets/css/compiled/main.css. Ensure Tailwind CSS build has been run." }}
+  {{ end }}
+  {{/* Icons */}}
+  {{ with .Site.Params.favicon }}
+    <link rel="icon" type="image/x-icon" href="{{ . | relURL }}" />
+  {{ end }}
+  {{ with .Site.Params.faviconSVG }}
+    <link rel="icon" type="image/svg+xml" href="{{ . | relURL }}" />
+  {{ end }}
+  {{ with .Site.Params.appleTouchIcon }}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ . | relURL }}" />
+  {{ end }}
+  {{/* RSS */}}
+  {{ if .Site.Params.enableRSS }}
+    {{ with .Site.Home.OutputFormats.Get "RSS" }}
+      <link rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" href="{{ .RelPermalink }}" />
+    {{ end }}
+  {{ end }}
+  {{/* JSON-LD */}}
+  {{ if .IsHome }}
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "{{ .Site.BaseURL }}#website",
+        "url": "{{ .Site.BaseURL }}",
+        "name": "{{ .Site.Title }}",
+        "description": "{{ .Site.Params.description }}"
+      }
+    </script>
+  {{ end }}
+  {{/* Site Verification */}}
+  {{ with .Site.Params.verification.google }}
+    <meta name="google-site-verification" content="{{ . }}" />
+  {{ end }}
+  {{/* Custom CSS */}}
+  {{ range .Site.Params.customCSS }}
+    {{ with resources.Get . }}
+      <link rel="stylesheet" href="{{ .RelPermalink }}" />
+    {{ end }}
+  {{ end }}
+  {{/* Author */}}
+  {{ with .Site.Params.author.name | default .Site.Params.author }}
+    <meta name="author" content="{{ . }}" />
+  {{ end }}
+  {{/* Bili */}}
+  {{ with resources.Get "css/custom.css" }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" />
+  {{ end }}
+  {{/* Vendor */}}
+  {{ partial "vendor.html" . }}
+  {{/* Analytics */}}
+  {{ partialCached "analytics.html" . }}
+  {{/* Extend head */}}
+  {{ if templates.Exists "partials/extend-head.html" }}
+    {{ partialCached "extend-head.html" . }}
+  {{ end }}
+</head>

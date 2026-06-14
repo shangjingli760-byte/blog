@@ -1,0 +1,234 @@
+<!-- 点赞按钮 -->
+<div class="like-container" id="like-container">
+  <button class="like-btn" id="like-btn" aria-label="点赞">
+    <svg class="like-icon" id="like-icon" viewBox="0 0 24 24" width="28" height="28">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+    <span class="like-count" id="like-count">0</span>
+    <span class="like-label">点赞</span>
+  </button>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var btn = document.getElementById('like-btn');
+  var icon = document.getElementById('like-icon');
+  var countEl = document.getElementById('like-count');
+  var container = document.getElementById('like-container');
+
+  // 从当前页面路径提取 slug
+  var path = window.location.pathname.replace(/\/$/, '');
+  var parts = path.split('/');
+  var slug = parts[parts.length - 1] || parts[parts.length - 2];
+  if (!slug || slug === 'posts' || slug === 'articles') return;
+
+  var STORAGE_KEY = 'congo_liked_' + slug;
+  var API_BASE = 'http://localhost:8080';
+
+  // 是否已点赞
+  var isLiked = localStorage.getItem(STORAGE_KEY) === 'true';
+
+  // 更新 UI
+  function updateUI(liked, count) {
+    if (liked) {
+      btn.classList.add('liked');
+      icon.style.fill = 'currentColor';
+    } else {
+      btn.classList.remove('liked');
+      icon.style.fill = 'none';
+    }
+    if (count !== undefined && count !== null) {
+      countEl.textContent = count;
+    }
+  }
+
+  // 加载点赞数
+  function loadLikeCount() {
+    return fetch(API_BASE + '/api/articles/' + encodeURIComponent(slug) + '/likes')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.code === 0 && data.data !== undefined) {
+          return data.data;
+        }
+        return null;
+      })
+      .catch(function() {
+        return null;
+      });
+  }
+
+  // 提交点赞
+  function submitLike() {
+    return fetch(API_BASE + '/api/articles/' + encodeURIComponent(slug) + '/likes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.code === 0 && data.data !== undefined) {
+          return data.data;
+        }
+        return null;
+      })
+      .catch(function() {
+        return null;
+      });
+  }
+
+  // 点赞动画
+  function animateLike() {
+    btn.classList.add('like-animating');
+    setTimeout(function() {
+      btn.classList.remove('like-animating');
+    }, 600);
+  }
+
+  // 初始化
+  function init() {
+    // 先加载点赞数
+    loadLikeCount().then(function(count) {
+      if (count !== null) {
+        updateUI(isLiked, count);
+      } else {
+        // API 不可用时，用本地计数
+        var localCount = parseInt(localStorage.getItem(STORAGE_KEY + '_count') || '0', 10);
+        updateUI(isLiked, localCount);
+      }
+    });
+
+    // 点击事件
+    btn.addEventListener('click', function() {
+      if (isLiked) return; // 已点赞，不可重复点击
+
+      isLiked = true;
+      localStorage.setItem(STORAGE_KEY, 'true');
+      animateLike();
+
+      // 乐观更新 UI
+      var current = parseInt(countEl.textContent || '0', 10);
+      countEl.textContent = current + 1;
+      updateUI(true, current + 1);
+
+      // 提交到后端
+      submitLike().then(function(count) {
+        if (count !== null) {
+          countEl.textContent = count;
+          localStorage.setItem(STORAGE_KEY + '_count', count.toString());
+        }
+      });
+    });
+  }
+
+  // 页面加载完成后初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+<style>
+.like-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0 1rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.15);
+  margin-top: 2rem;
+}
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  border: 2px solid rgba(128, 128, 128, 0.25);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--tw-neutral-500, #737373);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.like-btn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+  transform: translateY(-1px);
+}
+
+.like-btn.liked {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.like-icon {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.like-btn.liked .like-icon {
+  fill: currentColor;
+}
+
+.like-count {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.like-label {
+  color: inherit;
+  font-weight: 400;
+}
+
+/* 点赞动画 */
+.like-animating .like-icon {
+  animation: likePulse 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes likePulse {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.35); }
+  50%  { transform: scale(0.9); }
+  75%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* 深色模式 */
+.dark .like-btn {
+  color: var(--tw-neutral-400, #a3a3a3);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark .like-btn:hover,
+.dark .like-btn.liked {
+  color: #f87171;
+  border-color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* 微小的粒子效果（JS 动态添加） */
+.like-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  pointer-events: none;
+  z-index: 10;
+}
+</style>
