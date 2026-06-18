@@ -2,6 +2,7 @@
 package router
 
 import (
+	"blog-server/config"
 	"blog-server/handler"
 	"blog-server/middleware"
 	"blog-server/service"
@@ -11,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Setup(logger *zap.Logger, articleSvc *service.ArticleService, commentSvc *service.CommentService, db *gorm.DB) *gin.Engine {
+func Setup(cfg *config.Config, logger *zap.Logger, articleSvc *service.ArticleService, commentSvc *service.CommentService, db *gorm.DB) *gin.Engine {
 	r := gin.New()
 
 	// 全局中间件
@@ -33,11 +34,11 @@ func Setup(logger *zap.Logger, articleSvc *service.ArticleService, commentSvc *s
 	r.POST("/api/articles/:slug/comments", commentH.Create)
 
 	// === 管理端 API（需要 JWT 认证）===
-	adminH := handler.NewAdminHandler(articleSvc, commentSvc, db, logger)
+	adminH := handler.NewAdminHandler(articleSvc, commentSvc, db, logger, cfg)
 	r.POST("/api/admin/login", adminH.Login)
 
 	admin := r.Group("/api/admin")
-	admin.Use(middleware.AuthMiddleware())
+	admin.Use(middleware.AuthMiddleware(cfg))
 	{
 		// 文章管理
 		admin.POST("/articles", adminH.CreateArticle)

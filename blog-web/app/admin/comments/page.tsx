@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getAdminComments, deleteComment } from '@/lib/adminApi';
+import { GlassContainer } from '@/components/effects/GlassContainer';
 
 interface AdminComment {
   id: number;
@@ -33,6 +34,7 @@ export default function AdminCommentsPage() {
     try {
       await deleteComment(id);
       setMessage('删除成功');
+      setTimeout(() => setMessage(''), 3000);
       loadComments();
     } catch (err: any) {
       setMessage(err.message);
@@ -41,24 +43,29 @@ export default function AdminCommentsPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">评论管理</h2>
+      <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">评论管理</h2>
 
       {message && (
-        <div className={`mb-4 px-4 py-3 rounded-lg text-sm ${message.includes('成功') ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-          {message}
-        </div>
+        <GlassContainer
+          variant="strong"
+          className={`mb-6 px-4 py-3 ${message.includes('成功') ? 'bg-green-500/10 border-green-500/20' : 'bg-destructive/10 border-destructive/20'}`}
+        >
+          <p className={`text-sm ${message.includes('成功') ? 'text-green-400' : 'text-destructive'}`}>
+            {message}
+          </p>
+        </GlassContainer>
       )}
 
       {loading ? (
-        <p className="text-gray-400">加载中...</p>
+        <p className="text-muted-foreground">加载中...</p>
       ) : comments.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center text-gray-400">
-          暂无评论
-        </div>
+        <GlassContainer variant="card" className="p-12 text-center">
+          <p className="text-muted-foreground">暂无评论</p>
+        </GlassContainer>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <GlassContainer variant="card" className="overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-gray-500">
+            <thead className="bg-white/5 text-left text-foreground/80">
               <tr>
                 <th className="px-4 py-3 font-medium">昵称</th>
                 <th className="px-4 py-3 font-medium">邮箱</th>
@@ -67,22 +74,22 @@ export default function AdminCommentsPage() {
                 <th className="px-4 py-3 font-medium text-right">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-white/5">
               {comments.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-800">{c.nickname}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">{c.email}</td>
+                <tr key={c.id} className="hover:bg-white/5 transition-colors">
+                  <td className="px-4 py-3 font-medium text-foreground">{c.nickname}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs">{c.email}</td>
                   <td className="px-4 py-3">
-                    <p className="text-gray-600 max-w-xs truncate">{c.content}</p>
-                    <span className="text-xs text-gray-400">文章 #{c.article_id}</span>
+                    <p className="text-foreground/90 max-w-xs truncate">{c.content}</p>
+                    <span className="text-xs text-muted-foreground">文章 #{c.article_id}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-400 hidden md:table-cell">
+                  <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
                     {new Date(c.created_at).toLocaleDateString('zh-CN')}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => handleDelete(c.id)}
-                      className="text-red-500 hover:text-red-700 text-sm"
+                      className="text-destructive/70 hover:text-destructive text-sm transition-colors"
                     >
                       删除
                     </button>
@@ -91,7 +98,7 @@ export default function AdminCommentsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </GlassContainer>
       )}
     </div>
   );

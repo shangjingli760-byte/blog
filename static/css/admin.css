@@ -1,4 +1,0 @@
-/* 管理端补充样式 - 复用 Congo 主题风格 */
-.admin-nav-item.active {
-  @apply bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 font-medium;
-}

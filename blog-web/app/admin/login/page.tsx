@@ -4,6 +4,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminLogin } from '@/lib/adminApi';
+import { PixelCanvas } from '@/components/effects/PixelCanvas';
+import { GlassContainer } from '@/components/effects/GlassContainer';
+import { ShimmerText } from '@/components/effects/ShimmerText';
+import { Input } from '@/components/ui/input';
+import { GradientButton } from '@/components/ui/gradient-button';
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
@@ -27,47 +32,74 @@ export default function AdminLoginPage() {
     }
   };
 
+  const pixelColors = [
+    'rgba(162, 89, 255, 0.5)',
+    'rgba(94, 129, 244, 0.5)',
+    'rgba(0, 255, 255, 0.4)',
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">Blog 管理后台</h1>
+    <div className="min-h-screen flex items-center justify-center px-4 relative">
+      {/* Animated Background */}
+      <PixelCanvas colors={pixelColors} gap={5} speed={30} opacity={1} />
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,var(--background)_100%)] pointer-events-none opacity-80" />
+
+      {/* Login Card */}
+      <GlassContainer variant="card" className="relative z-10 p-8 w-full max-w-md animate-scaleIn">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">
+            <ShimmerText>Blog 管理</ShimmerText>
+          </h1>
+          <p className="text-sm text-muted-foreground">登录以管理您的博客内容</p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
+            <GlassContainer variant="strong" className="bg-destructive/10 border-destructive/20 px-4 py-3">
+              <p className="text-destructive text-sm">{error}</p>
+            </GlassContainer>
           )}
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">用户名</label>
-            <input
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
+              用户名
+            </label>
+            <Input
               type="text"
+              variant="glass"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="请输入用户名"
               autoComplete="username"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">密码</label>
-            <input
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
+              密码
+            </label>
+            <Input
               type="password"
+              variant="glass"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="请输入密码"
               autoComplete="current-password"
             />
           </div>
-          <button
+
+          <GradientButton
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="w-full"
+            size="md"
           >
             {loading ? '登录中...' : '登 录'}
-          </button>
+          </GradientButton>
         </form>
-      </div>
+      </GlassContainer>
     </div>
   );
 }

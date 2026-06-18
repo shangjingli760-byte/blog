@@ -2,19 +2,19 @@
 package handler
 
 import (
-	"crypto/md5"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
+	"blog-server/config"
 	"blog-server/model"
 	"blog-server/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -23,10 +23,11 @@ type AdminHandler struct {
 	commentSvc *service.CommentService
 	db         *gorm.DB
 	logger     *zap.Logger
+	cfg        *config.Config
 }
 
-func NewAdminHandler(articleSvc *service.ArticleService, commentSvc *service.CommentService, db *gorm.DB, logger *zap.Logger) *AdminHandler {
-	return &AdminHandler{articleSvc: articleSvc, commentSvc: commentSvc, db: db, logger: logger}
+func NewAdminHandler(articleSvc *service.ArticleService, commentSvc *service.CommentService, db *gorm.DB, logger *zap.Logger, cfg *config.Config) *AdminHandler {
+	return &AdminHandler{articleSvc: articleSvc, commentSvc: commentSvc, db: db, logger: logger, cfg: cfg}
 }
 
 // POST /api/admin/login - 管理员登录
@@ -39,31 +40,33 @@ func (h *AdminHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "参数错误"})
 		return
 	}
-	adminUser := os.Getenv("ADMIN_USER")
-	if adminUser == "" {
-		adminUser = "admin"
-	}
-	adminPass := os.Getenv("ADMIN_PASSWORD")
-	if adminPass == "" {
-		adminPass = "admin123"
-	}
-	// 密码简单哈希比对
-	reqHash := fmt.Sprintf("%x", md5.Sum([]byte(req.Password)))
-	cfgHash := fmt.Sprintf("%x", md5.Sum([]byte(adminPass)))
-	if req.Username != adminUser || reqHash != cfgHash {
-		h.logger.Warn("登录失败", zap.String("user", req.Username))
+	// 验证用户名
+	if req.Username != h.cfg.AdminUser {
+		h.logger.Warn("登录失败：用户名错误", zap.String("user", req.Username))
 		c.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "用户名或密码错误"})
 		return
 	}
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		secret = "blog-jwt-secret-change-in-production"
+
+	// 使用 bcrypt 验证密码（支持明文向后兼容和 bcrypt 哈希）
+	err := bcrypt.CompareHashAndPassword([]byte(h.cfg.AdminPassword), []byte(req.Password))
+	if err != nil {
+		// 如果 bcrypt 验证失败，尝试明文比对（向后兼容，不推荐）
+		if req.Password != h.cfg.AdminPassword {
+			h.logger.Warn("登录失败：密码错误", zap.String("user", req.Username))
+			c.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "用户名或密码错误"})
+			return
+		}
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user": req.Username,
 		"exp":  time.Now().Add(24 * time.Hour).Unix(),
 	})
-	tokenStr, _ := token.SignedString([]byte(secret))
+	tokenStr, err := token.SignedString([]byte(h.cfg.JWTSecret))
+	if err != nil {
+		h.logger.Error("JWT 签名失败", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误"})
+		return
+	}
 	h.logger.Info("管理员登录成功", zap.String("user", req.Username))
 	c.JSON(http.StatusOK, gin.H{"code": 0, "msg": "success", "data": gin.H{"token": tokenStr}})
 }

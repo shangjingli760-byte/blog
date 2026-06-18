@@ -58,6 +58,10 @@ enableRobotsTXT = true
   # 配色
   colorScheme = "congo"
 
+  # 自定义 CSS
+  [params.customCSS]
+    assets = ["css/custom.css"]
+
   # 主页布局: page(普通), profile(个人介绍), custom(自定义)
   homepage.layout = "page"
   homepage.showRecent = true

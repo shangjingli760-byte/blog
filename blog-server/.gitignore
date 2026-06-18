@@ -1,0 +1,27 @@
+# Go 编译产物
+*.exe
+blog-server
+*.test
+*.out
+
+# 数据库文件
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# 环境变量
+.env
+.env.local
+
+# 日志文件
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

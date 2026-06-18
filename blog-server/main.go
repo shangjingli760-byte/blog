@@ -2,9 +2,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"blog-server/config"
 	"blog-server/model"
@@ -29,14 +34,19 @@ func main() {
 	defer logger.Sync()
 
 	// 初始化数据库
-	dbPath := os.Getenv("DB_PATH")
-	if dbPath == "" {
-		dbPath = cfg.DBPath
-	}
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
 	if err != nil {
 		logger.Fatal("数据库连接失败", zap.Error(err))
 	}
+
+	// 配置数据库连接池
+	sqlDB, err := db.DB()
+	if err != nil {
+		logger.Fatal("获取数据库实例失败", zap.Error(err))
+	}
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(5)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
 
 	// 自动迁移表结构
 	if err := db.AutoMigrate(&model.Article{}, &model.Comment{}); err != nil {
@@ -50,10 +60,35 @@ func main() {
 	commentSvc := service.NewCommentService(commentRepo)
 
 	// 启动服务
-	r := router.Setup(logger, articleSvc, commentSvc, db)
+	r := router.Setup(cfg, logger, articleSvc, commentSvc, db)
 	addr := fmt.Sprintf(":%s", cfg.Port)
-	logger.Info("服务启动", zap.String("addr", addr))
-	if err := r.Run(addr); err != nil {
-		logger.Fatal("服务启动失败", zap.Error(err))
+
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: r,
 	}
+
+	// 在 goroutine 中启动服务器
+	go func() {
+		logger.Info("服务启动", zap.String("addr", addr))
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Fatal("服务启动失败", zap.Error(err))
+		}
+	}()
+
+	// 等待中断信号以优雅关闭服务器
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logger.Info("正在关闭服务器...")
+
+	// 设置 5 秒超时上下文
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		logger.Fatal("服务器强制关闭", zap.Error(err))
+	}
+
+	logger.Info("服务器已退出")
 }

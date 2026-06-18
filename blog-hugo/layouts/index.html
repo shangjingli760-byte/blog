@@ -1,0 +1,302 @@
+{{ define "main" }}
+<style>
+/* Gallery4 横向滚动轮播样式 */
+.gallery4-section {
+  position: relative;
+  width: 100%;
+  margin-bottom: 3rem;
+}
+
+.gallery4-scroll {
+  display: flex !important;
+  gap: 1.25rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  min-height: 360px !important;
+}
+
+.gallery4-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery4-item {
+  flex: 0 0 320px !important;
+  scroll-snap-align: start;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 320px !important;
+}
+
+@media (min-width: 1024px) {
+  .gallery4-item {
+    flex: 0 0 384px !important;
+  }
+}
+
+.gallery4-item > a {
+  display: block !important;
+  width: 100% !important;
+  height: 320px !important;
+}
+
+.gallery4-item > a > div {
+  min-height: 320px !important;
+  height: 320px !important;
+}
+
+.gallery4-prev,
+.gallery4-next {
+  transition: all 0.2s ease;
+}
+
+.gallery4-prev:disabled,
+.gallery4-next:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gallery4-dot {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.gallery4-dot:hover {
+  transform: scale(1.2);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
+
+{{- $pages := where .Site.RegularPages "Type" "posts" -}}
+{{- $limit := .Site.Params.homepage.showRecentItems | default 5 -}}
+
+{{- if gt (len $pages) 0 -}}
+
+<!-- 精选文章横向滚动区域 - Gallery4 风格 -->
+<section class="gallery4-section py-16">
+  <div class="container mx-auto px-4">
+    <div class="mb-8 flex items-end justify-between md:mb-14 lg:mb-16">
+      <div class="flex flex-col gap-4">
+        <h2 class="text-3xl font-medium text-neutral-800 dark:text-neutral-100 md:text-4xl lg:text-5xl">
+          ✨ 精选文章
+        </h2>
+        <p class="max-w-lg text-neutral-600 dark:text-neutral-400">探索最新的技术文章和开发经验分享</p>
+      </div>
+      <div class="hidden shrink-0 gap-2 md:flex">
+        <button class="gallery4-prev h-10 w-10 inline-flex items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <button class="gallery4-next h-10 w-10 inline-flex items-center justify-center rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:pointer-events-none">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 横向滚动容器 -->
+  <div class="w-full">
+    <div class="gallery4-scroll flex gap-5 overflow-x-auto scroll-smooth pb-8 px-4" style="scrollbar-width: none; -ms-overflow-style: none; min-height: 360px;">
+      {{- range first 6 $pages -}}
+      <div class="gallery4-item flex-none w-80 lg:w-96">
+        <a href="{{ .RelPermalink }}" class="group block rounded-xl overflow-hidden">
+          <div class="relative h-80 overflow-hidden rounded-xl">
+            <!-- 背景渐变 -->
+            <div class="absolute inset-0" style="background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);"></div>
+
+            <!-- 渐变遮罩 -->
+            <div class="absolute inset-0" style="background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.8) 100%);"></div>
+
+            <!-- 内容 -->
+            <div class="absolute inset-x-0 bottom-0 flex flex-col items-start p-6 text-white md:p-8">
+              {{- with .Params.categories -}}
+              <span class="mb-2 text-xs font-semibold px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+                {{- range first 1 . -}}{{ . }}{{- end -}}
+              </span>
+              {{- end -}}
+
+              <div class="mb-2 pt-4 text-xl font-semibold md:mb-3">
+                {{ .Title }}
+              </div>
+
+              {{- with .Params.summary -}}
+              <div class="mb-8 line-clamp-2 text-sm opacity-90 md:mb-12 lg:mb-9">
+                {{ . }}
+              </div>
+              {{- end -}}
+
+              <div class="flex items-center text-sm group-hover:translate-x-1 transition-transform">
+                阅读更多
+                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+      {{- end -}}
+    </div>
+
+    <!-- 进度指示器 -->
+    <div class="mt-8 flex justify-center gap-2">
+      {{- range $index, $_ := first 6 $pages -}}
+      <button class="gallery4-dot h-2 w-2 rounded-full transition-colors bg-neutral-300 dark:bg-neutral-600" data-index="{{ $index }}" aria-label="Go to slide {{ add $index 1 }}"></button>
+      {{- end -}}
+    </div>
+  </div>
+</section>
+
+{{- end -}}
+
+<article>
+  {{ .Content }}
+
+  {{- if gt (len $pages) 0 -}}
+
+  <!-- 最近文章网格布局 -->
+  <section class="recent-section">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-3xl font-bold text-neutral-800 dark:text-neutral-100">
+        📝 最近更新
+      </h2>
+      {{- with .Site.Params.homepage.showRecentLink -}}
+      <a href="/posts/" class="text-primary-600 dark:text-primary-400 hover:underline font-medium">
+        {{ . }} →
+      </a>
+      {{- end -}}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {{- range first $limit $pages -}}
+      <article class="article-card group">
+        <a href="{{ .RelPermalink }}" class="block h-full">
+          <div class="article-card-inner">
+            <h3 class="article-card-title">
+              {{ .Title }}
+            </h3>
+            {{- with .Params.summary -}}
+            <p class="article-card-summary">
+              {{ . }}
+            </p>
+            {{- end -}}
+            <div class="article-card-footer">
+              <time datetime="{{ .Date }}" class="text-sm text-neutral-500 dark:text-neutral-400">
+                {{ .Date.Format "2006-01-02" }}
+              </time>
+              {{- with .Params.tags -}}
+              <div class="flex gap-2">
+                {{- range first 2 . -}}
+                <span class="text-xs px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
+                  {{ . }}
+                </span>
+                {{- end -}}
+              </div>
+              {{- end -}}
+            </div>
+          </div>
+        </a>
+      </article>
+      {{- end -}}
+    </div>
+  </section>
+
+  {{- end -}}
+</article>
+
+<!-- Gallery4 交互脚本 -->
+<script>
+(function() {
+  const scrollContainer = document.querySelector('.gallery4-scroll');
+  const prevBtn = document.querySelector('.gallery4-prev');
+  const nextBtn = document.querySelector('.gallery4-next');
+  const dots = document.querySelectorAll('.gallery4-dot');
+
+  if (!scrollContainer || !prevBtn || !nextBtn) return;
+
+  const itemWidth = 320 + 20; // 卡片宽度 + gap
+  let currentIndex = 0;
+  const totalItems = dots.length;
+
+  function updateButtons() {
+    const scrollLeft = scrollContainer.scrollLeft;
+    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+    prevBtn.disabled = scrollLeft <= 0;
+    nextBtn.disabled = scrollLeft >= maxScroll - 5;
+
+    // 更新当前索引
+    currentIndex = Math.round(scrollLeft / itemWidth);
+
+    // 更新指示器
+    dots.forEach((dot, index) => {
+      if (index === currentIndex) {
+        dot.classList.add('bg-neutral-800', 'dark:bg-neutral-100');
+        dot.classList.remove('bg-neutral-300', 'dark:bg-neutral-600');
+      } else {
+        dot.classList.remove('bg-neutral-800', 'dark:bg-neutral-100');
+        dot.classList.add('bg-neutral-300', 'dark:bg-neutral-600');
+      }
+    });
+  }
+
+  function scrollToIndex(index) {
+    scrollContainer.scrollTo({
+      left: index * itemWidth,
+      behavior: 'smooth'
+    });
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      scrollToIndex(currentIndex - 1);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (currentIndex < totalItems - 1) {
+      scrollToIndex(currentIndex + 1);
+    }
+  });
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      scrollToIndex(index);
+    });
+  });
+
+  scrollContainer.addEventListener('scroll', updateButtons);
+
+  // 初始化
+  updateButtons();
+
+  // 隐藏滚动条
+  scrollContainer.style.scrollbarWidth = 'none';
+  scrollContainer.style.msOverflowStyle = 'none';
+})();
+</script>
+
+<style>
+.gallery4-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
+{{ end }}
