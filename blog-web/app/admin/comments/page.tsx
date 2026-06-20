@@ -2,17 +2,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { getAdminComments, deleteComment } from '@/lib/adminApi';
+import { getAdminComments, deleteComment, type AdminComment } from '@/lib/adminApi';
 import { GlassContainer } from '@/components/effects/GlassContainer';
-
-interface AdminComment {
-  id: number;
-  article_id: number;
-  nickname: string;
-  email: string;
-  content: string;
-  created_at: string;
-}
 
 export default function AdminCommentsPage() {
   const [comments, setComments] = useState<AdminComment[]>([]);
@@ -22,7 +13,7 @@ export default function AdminCommentsPage() {
   const loadComments = useCallback(() => {
     setLoading(true);
     getAdminComments()
-      .then(setComments)
+      .then((res) => setComments(res.list))
       .catch((err) => setMessage(err.message))
       .finally(() => setLoading(false));
   }, []);

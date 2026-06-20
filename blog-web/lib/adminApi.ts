@@ -41,7 +41,7 @@ export async function deleteArticle(slug: string) {
   });
 }
 
-interface AdminComment {
+export interface AdminComment {
   id: number;
   article_id: number;
   nickname: string;
@@ -50,9 +50,16 @@ interface AdminComment {
   created_at: string;
 }
 
-// 评论列表
-export async function getAdminComments() {
-  return apiFetch<AdminComment[]>(`${API_BASE}/api/admin/comments`, {
+interface AdminCommentsResponse {
+  list: AdminComment[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+// 评论列表（分页）
+export async function getAdminComments(page = 1, pageSize = 20) {
+  return apiFetch<AdminCommentsResponse>(`${API_BASE}/api/admin/comments?page=${page}&page_size=${pageSize}`, {
     headers: authHeaders(),
   });
 }
