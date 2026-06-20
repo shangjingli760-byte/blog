@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+
 type CommentService struct {
 	repo *repository.CommentRepository
 }
@@ -27,7 +29,6 @@ func (s *CommentService) CreateComment(comment *model.Comment) error {
 	if comment.Nickname == "" || comment.Email == "" || comment.Content == "" {
 		return errors.New("昵称、邮箱、内容不能为空")
 	}
-	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
 	if !emailRegex.MatchString(comment.Email) {
 		return errors.New("邮箱格式不正确")
 	}

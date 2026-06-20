@@ -27,7 +27,7 @@ func (h *ArticleHandler) List(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务端错误"})
 		return
 	}
-	h.logger.Info("获取文章列表成功", zap.Int("count", len(articles)))
+	h.logger.Debug("获取文章列表成功", zap.Int("count", len(articles)))
 	c.JSON(http.StatusOK, gin.H{"code": 0, "msg": "success", "data": articles})
 }
 
@@ -40,6 +40,6 @@ func (h *ArticleHandler) Detail(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "文章不存在"})
 		return
 	}
-	h.logger.Info("获取文章详情成功", zap.String("slug", slug))
+	h.logger.Debug("获取文章详情成功", zap.String("slug", slug))
 	c.JSON(http.StatusOK, gin.H{"code": 0, "msg": "success", "data": article})
 }

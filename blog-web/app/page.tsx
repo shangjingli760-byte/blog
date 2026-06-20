@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getArticles } from '@/lib/api';
 import type { Article } from '@/lib/api';
 import Header from '@/components/Header';
@@ -12,33 +12,58 @@ import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { Meteors } from '@/components/ui/meteors';
 import { BlurFade } from '@/components/ui/blur-fade';
 
-// ── 模块级常量 ──────────────────────────────────────────────────────
 const SITE_BIRTH = new Date('2024-01-01T00:00:00Z');
-
 const PIXEL_COLORS = [
   'rgba(168, 85, 247, 0.55)',
   'rgba(99, 102, 241, 0.55)',
   'rgba(6, 182, 212, 0.45)',
 ];
-// ─────────────────────────────────────────────────────────────────────
 
-function useSiteAge() {
-  const [elapsed, setElapsed] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+// ── 独立计时器组件（自己的 state + interval，不触发父组件重渲染）────────
+function UptimeDisplay() {
+  const [age, setAge] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
   useEffect(() => {
-    const calc = () => {
+    const tick = () => {
       const diff = Date.now() - SITE_BIRTH.getTime();
-      setElapsed({
+      setAge({
         days: Math.floor(diff / 86400000),
         hours: Math.floor((diff % 86400000) / 3600000),
         minutes: Math.floor((diff % 3600000) / 60000),
         seconds: Math.floor((diff % 60000) / 1000),
       });
     };
-    calc();
-    const id = setInterval(calc, 1000);
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-  return elapsed;
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex items-center gap-2">
+        <span className="w-4 h-px bg-purple-500/60" />
+        <span className="text-[11px] tracking-[0.3em] uppercase text-white/45 font-mono">UPTIME</span>
+        <span className="w-4 h-px bg-purple-500/60" />
+      </div>
+      <div className="flex items-end gap-3 sm:gap-4">
+        <UptimeUnit value={age.days} label="天" />
+        <Separator />
+        <UptimeUnit value={age.hours} label="时" />
+        <Separator />
+        <UptimeUnit value={age.minutes} label="分" />
+        <Separator />
+        <UptimeUnit value={age.seconds} label="秒" />
+      </div>
+      <div className="flex items-center gap-3 opacity-30">
+        <span className="w-12 h-px bg-gradient-to-r from-transparent to-purple-500" />
+        <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+        <span className="w-12 h-px bg-gradient-to-l from-transparent to-purple-500" />
+      </div>
+      <p className="text-[11px] font-mono text-white/40 tracking-widest">
+        SINCE {SITE_BIRTH.getFullYear()}.{String(SITE_BIRTH.getMonth() + 1).padStart(2, '0')}.{String(SITE_BIRTH.getDate()).padStart(2, '0')}
+      </p>
+    </div>
+  );
 }
 
 function UptimeUnit({ value, label, minDigits = 2 }: { value: number; label: string; minDigits?: number }) {
@@ -52,52 +77,13 @@ function UptimeUnit({ value, label, minDigits = 2 }: { value: number; label: str
           boxShadow: '0 0 24px rgba(168,85,247,0.1), inset 0 1px 0 rgba(255,255,255,0.06)',
         }}
       >
-        {/* corner dots */}
         <span className="absolute top-2 left-2 w-1 h-1 rounded-full bg-purple-500/40" />
         <span className="absolute top-2 right-2 w-1 h-1 rounded-full bg-purple-500/40" />
         <span className="absolute bottom-2 left-2 w-1 h-1 rounded-full bg-purple-500/40" />
         <span className="absolute bottom-2 right-2 w-1 h-1 rounded-full bg-purple-500/40" />
         <FlipNumber value={value} minDigits={minDigits} />
       </div>
-      <span className="text-[11px] tracking-[0.25em] uppercase text-white/30 font-medium">{label}</span>
-    </div>
-  );
-}
-
-function UptimeDisplay({ age, mounted }: { age: ReturnType<typeof useSiteAge>; mounted: boolean }) {
-  return (
-    <div className="flex flex-col items-center gap-6">
-      {/* 顶部标签 */}
-      <div className="flex items-center gap-2">
-        <span className="w-4 h-px bg-purple-500/40" />
-        <span className="text-[11px] tracking-[0.3em] uppercase text-white/25 font-mono">UPTIME</span>
-        <span className="w-4 h-px bg-purple-500/40" />
-      </div>
-
-      {/* 四格计时器 */}
-      {mounted && (
-        <div className="flex items-end gap-3 sm:gap-4">
-          <UptimeUnit value={age.days} label="天" />
-          <Separator />
-          <UptimeUnit value={age.hours} label="时" />
-          <Separator />
-          <UptimeUnit value={age.minutes} label="分" />
-          <Separator />
-          <UptimeUnit value={age.seconds} label="秒" />
-        </div>
-      )}
-
-      {/* 底部装饰线 */}
-      <div className="flex items-center gap-3 opacity-30">
-        <span className="w-12 h-px bg-gradient-to-r from-transparent to-purple-500" />
-        <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-        <span className="w-12 h-px bg-gradient-to-l from-transparent to-purple-500" />
-      </div>
-
-      {/* 建站日期 */}
-      <p className="text-[11px] font-mono text-white/20 tracking-widest">
-        SINCE {SITE_BIRTH.getFullYear()}.{String(SITE_BIRTH.getMonth() + 1).padStart(2, '0')}.{String(SITE_BIRTH.getDate()).padStart(2, '0')}
-      </p>
+      <span className="text-[11px] tracking-[0.25em] uppercase text-white/45 font-medium">{label}</span>
     </div>
   );
 }
@@ -110,15 +96,13 @@ function Separator() {
     </div>
   );
 }
+// ─────────────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  const age = useSiteAge();
 
   useEffect(() => {
-    setMounted(true);
     getArticles()
       .then(setArticles)
       .catch(() => setArticles([]))
@@ -146,8 +130,6 @@ export default function HomePage() {
 
           {/* 上：文字 */}
           <div className="flex flex-col items-center text-center">
-
-            {/* 徽章 */}
             <BlurFade delay={0.1} inView>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-1 mb-6">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
@@ -158,25 +140,18 @@ export default function HomePage() {
               </div>
             </BlurFade>
 
-            {/* 主标题 */}
             <BlurFade delay={0.2} inView>
               <h1
                 className="text-[clamp(3rem,10vw,7rem)] font-black leading-[1.1] tracking-tighter mb-12 select-none"
                 style={{
-                  background: 'linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.45) 30%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.85) 65%, rgba(255,255,255,0.2) 80%, #fff 100%)',
-                  backgroundSize: '200% auto',
-                  WebkitBackgroundClip: 'text', backgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  WebkitTextStroke: '1px rgba(255,255,255,0.15)',
-                  filter: 'drop-shadow(0 0 40px rgba(168,85,247,0.35))',
-                  animation: 'shimmer 8s linear infinite',
+                  color: '#ffffff',
+                  textShadow: '0 0 40px rgba(168,85,247,0.5), 0 0 80px rgba(99,102,241,0.3)',
                 }}
               >
-                lizq的小站
+                分享永无止境
               </h1>
             </BlurFade>
 
-            {/* CTA */}
             <BlurFade delay={0.5} inView>
               <ShimmerButton
                 shimmerColor="rgba(168,85,247,0.8)"
@@ -194,9 +169,9 @@ export default function HomePage() {
             </BlurFade>
           </div>
 
-          {/* 下：运行时长 */}
+          {/* 下：运行时长（独立组件，每秒仅此模块重渲染） */}
           <BlurFade delay={0.3} inView>
-            <UptimeDisplay age={age} mounted={mounted} />
+            <UptimeDisplay />
           </BlurFade>
         </div>
 
@@ -247,8 +222,8 @@ export default function HomePage() {
 
       {/* ── Footer ───────────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-white/[0.05] py-8 text-center">
-        <p className="text-xs text-white/20 tracking-widest">
-          © {new Date().getFullYear()} lizq的小站 · Powered by Next.js + Go
+        <p className="text-xs text-white/35 tracking-widest">
+          &copy; {new Date().getFullYear()} lizq的小站 &middot; Powered by Next.js + Go
         </p>
       </footer>
     </div>

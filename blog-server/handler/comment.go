@@ -11,6 +11,13 @@ import (
 	"go.uber.org/zap"
 )
 
+// CreateCommentReq 创建评论请求（仅暴露允许用户填写的字段）
+type CreateCommentReq struct {
+	Nickname string `json:"nickname"`
+	Email    string `json:"email"`
+	Content  string `json:"content"`
+}
+
 type CommentHandler struct {
 	svc        *service.CommentService
 	articleSvc *service.ArticleService
@@ -53,18 +60,21 @@ func (h *CommentHandler) Create(c *gin.Context) {
 	if !ok {
 		return
 	}
-	var comment model.Comment
-	if err := c.ShouldBindJSON(&comment); err != nil {
+	var req CreateCommentReq
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "参数错误"})
 		return
 	}
-	comment.ArticleID = article.ID
-	if err := h.svc.CreateComment(&comment); err != nil {
+	comment := &model.Comment{
+		ArticleID: article.ID,
+		Nickname:  req.Nickname,
+		Email:     req.Email,
+		Content:   req.Content,
+	}
+	if err := h.svc.CreateComment(comment); err != nil {
 		h.logger.Error("创建评论失败", zap.Error(err))
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": err.Error()})
 		return
 	}
-	// 日志中不输出邮箱等敏感信息
-	h.logger.Info("创建评论成功", zap.Uint("article_id", comment.ArticleID))
 	c.JSON(http.StatusOK, gin.H{"code": 0, "msg": "success", "data": comment})
 }
