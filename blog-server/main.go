@@ -61,6 +61,7 @@ func main() {
 
 	// 启动服务
 	r := router.Setup(cfg, logger, articleSvc, commentSvc, db)
+
 	addr := fmt.Sprintf(":%s", cfg.Port)
 
 	srv := &http.Server{

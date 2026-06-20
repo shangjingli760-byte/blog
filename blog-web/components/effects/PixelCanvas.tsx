@@ -109,7 +109,9 @@ export function PixelCanvas({ colors, gap = 5, speed = 30, opacity = 1, classNam
 
       const loop = () => {
         rafRef.current = requestAnimationFrame(loop);
-        ctx.clearRect(0, 0, canvas!.width, canvas!.height);
+        // 用半透明覆盖替代 clearRect，消除闪烁
+        ctx.fillStyle = 'rgba(5, 5, 8, 0.12)';
+        ctx.fillRect(0, 0, canvas!.width, canvas!.height);
         const pixels = pixelsRef.current;
         for (const p of pixels) p[mode]();
         if (pixels.every((p) => p.isIdle)) cancelAnimationFrame(rafRef.current);
