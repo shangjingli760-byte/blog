@@ -136,21 +136,21 @@ export default async function ArticlePage({ params }: Props) {
         {/* ===== 文章正文 ===== */}
         <article
           className="
-            prose prose-invert max-w-none
-            prose-headings:font-bold prose-headings:text-white/85 prose-headings:tracking-tight
-            prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-white/[0.06] prose-h2:pb-2
-            prose-p:text-white/55 prose-p:leading-[1.9]
-            prose-a:text-purple-400 prose-a:no-underline hover:prose-a:text-purple-300
-            prose-strong:text-white/80 prose-strong:font-semibold
-            prose-em:text-white/60
-            prose-code:text-cyan-300 prose-code:bg-white/[0.06] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-            prose-pre:bg-white/[0.04] prose-pre:border prose-pre:border-white/[0.07] prose-pre:rounded-xl
-            prose-blockquote:border-l-purple-500 prose-blockquote:text-white/40 prose-blockquote:not-italic
-            prose-li:text-white/55 prose-li:marker:text-purple-500
+            prose max-w-none
+            prose-headings:font-bold prose-headings:text-white prose-headings:tracking-tight
+            prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
+            prose-p:text-white/75 prose-p:leading-[1.9]
+            prose-a:text-purple-300 prose-a:no-underline hover:prose-a:text-purple-200
+            prose-strong:text-white prose-strong:font-semibold
+            prose-em:text-white/70
+            prose-code:text-cyan-300 prose-code:bg-white/[0.08] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+            prose-pre:bg-white/[0.04] prose-pre:border prose-pre:border-white/[0.07] prose-pre:rounded-xl prose-pre:text-white/80
+            prose-blockquote:border-l-purple-500 prose-blockquote:text-white/60 prose-blockquote:not-italic
+            prose-li:text-white/75 prose-li:marker:text-purple-400
             prose-img:rounded-xl prose-img:shadow-[0_0_30px_rgba(0,0,0,0.5)]
             prose-hr:border-white/[0.07]
-            prose-table:text-white/60
-            prose-th:text-white/80 prose-th:border-white/[0.1]
+            prose-table:text-white/75
+            prose-th:text-white prose-th:border-white/[0.1]
             prose-td:border-white/[0.07]
           "
           dangerouslySetInnerHTML={{ __html: article.html }}
