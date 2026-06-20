@@ -135,39 +135,32 @@ export default async function ArticlePage({ params }: Props) {
 
         {/* ===== 文章正文 ===== */}
         <style>{`
-          .article-content {
-            --tw-prose-body: rgba(255,255,255,0.75);
-            --tw-prose-headings: #fff;
-            --tw-prose-lead: rgba(255,255,255,0.65);
-            --tw-prose-links: #c4b5fd;
-            --tw-prose-bold: #fff;
-            --tw-prose-counters: rgba(255,255,255,0.5);
-            --tw-prose-bullets: rgba(168,85,247,0.6);
-            --tw-prose-hr: rgba(255,255,255,0.07);
-            --tw-prose-quotes: rgba(255,255,255,0.6);
-            --tw-prose-quote-borders: rgba(168,85,247,0.5);
-            --tw-prose-captions: rgba(255,255,255,0.5);
-            --tw-prose-code: #67e8f9;
-            --tw-prose-pre-code: rgba(255,255,255,0.8);
-            --tw-prose-pre-bg: rgba(255,255,255,0.04);
-            --tw-prose-th-borders: rgba(255,255,255,0.1);
-            --tw-prose-td-borders: rgba(255,255,255,0.07);
-          }
-          .article-content h1, .article-content h2, .article-content h3, .article-content h4 { color: #fff !important; }
+          .article-content { color: rgba(255,255,255,0.75); line-height: 1.9; }
+          .article-content h1, .article-content h2, .article-content h3, .article-content h4 { color: #fff; font-weight: 700; }
+          .article-content h1 { font-size: 1.875rem; }
+          .article-content h2 { font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem; }
+          .article-content h3 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+          .article-content h4 { font-size: 1.1rem; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+          .article-content p { color: rgba(255,255,255,0.75); margin-bottom: 1.25rem; line-height: 1.9; }
+          .article-content a { color: #c4b5fd; text-decoration: none; }
+          .article-content a:hover { color: #ddd6fe; }
+          .article-content strong { color: #fff; font-weight: 600; }
+          .article-content em { color: rgba(255,255,255,0.7); }
+          .article-content ul, .article-content ol { color: rgba(255,255,255,0.75); padding-left: 1.5rem; margin-bottom: 1.25rem; }
+          .article-content li { color: rgba(255,255,255,0.75); margin-bottom: 0.5rem; }
+          .article-content li::marker { color: rgba(168,85,247,0.6); }
+          .article-content blockquote { border-left: 3px solid rgba(168,85,247,0.5); padding-left: 1rem; color: rgba(255,255,255,0.6); margin: 1.5rem 0; font-style: normal; }
+          .article-content code { color: #67e8f9; background: rgba(255,255,255,0.08); padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-size: 0.85em; font-family: monospace; }
+          .article-content pre { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 0.75rem; padding: 1rem; overflow-x: auto; margin: 1.5rem 0; }
+          .article-content pre code { background: none; padding: 0; color: rgba(255,255,255,0.8); }
+          .article-content hr { border-color: rgba(255,255,255,0.07); margin: 2rem 0; }
+          .article-content table { color: rgba(255,255,255,0.75); width: 100%; margin: 1.5rem 0; }
+          .article-content th { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0.5rem; text-align: left; }
+          .article-content td { border-bottom: 1px solid rgba(255,255,255,0.07); padding: 0.5rem; }
+          .article-content img { border-radius: 0.75rem; max-width: 100%; }
         `}</style>
         <article
-          className="
-            prose article-content max-w-none
-            prose-headings:font-bold prose-headings:tracking-tight
-            prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
-            prose-p:leading-[1.9]
-            prose-a:no-underline hover:prose-a:text-purple-200
-            prose-strong:font-semibold
-            prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-            prose-pre:border prose-pre:border-white/[0.07] prose-pre:rounded-xl
-            prose-blockquote:border-l-purple-500 prose-blockquote:not-italic
-            prose-img:rounded-xl prose-img:shadow-[0_0_30px_rgba(0,0,0,0.5)]
-          "
+          className="article-content max-w-none"
           dangerouslySetInnerHTML={{ __html: article.html }}
         />
 
