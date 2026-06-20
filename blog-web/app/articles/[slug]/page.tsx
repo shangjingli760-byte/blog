@@ -134,24 +134,39 @@ export default async function ArticlePage({ params }: Props) {
         </BlurFade>
 
         {/* ===== 文章正文 ===== */}
+        <style>{`
+          .article-content {
+            --tw-prose-body: rgba(255,255,255,0.75);
+            --tw-prose-headings: #fff;
+            --tw-prose-lead: rgba(255,255,255,0.65);
+            --tw-prose-links: #c4b5fd;
+            --tw-prose-bold: #fff;
+            --tw-prose-counters: rgba(255,255,255,0.5);
+            --tw-prose-bullets: rgba(168,85,247,0.6);
+            --tw-prose-hr: rgba(255,255,255,0.07);
+            --tw-prose-quotes: rgba(255,255,255,0.6);
+            --tw-prose-quote-borders: rgba(168,85,247,0.5);
+            --tw-prose-captions: rgba(255,255,255,0.5);
+            --tw-prose-code: #67e8f9;
+            --tw-prose-pre-code: rgba(255,255,255,0.8);
+            --tw-prose-pre-bg: rgba(255,255,255,0.04);
+            --tw-prose-th-borders: rgba(255,255,255,0.1);
+            --tw-prose-td-borders: rgba(255,255,255,0.07);
+          }
+          .article-content h1, .article-content h2, .article-content h3, .article-content h4 { color: #fff !important; }
+        `}</style>
         <article
           className="
-            prose max-w-none
-            prose-headings:font-bold prose-headings:text-white prose-headings:tracking-tight
+            prose article-content max-w-none
+            prose-headings:font-bold prose-headings:tracking-tight
             prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
-            prose-p:text-white/75 prose-p:leading-[1.9]
-            prose-a:text-purple-300 prose-a:no-underline hover:prose-a:text-purple-200
-            prose-strong:text-white prose-strong:font-semibold
-            prose-em:text-white/70
-            prose-code:text-cyan-300 prose-code:bg-white/[0.08] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-            prose-pre:bg-white/[0.04] prose-pre:border prose-pre:border-white/[0.07] prose-pre:rounded-xl prose-pre:text-white/80
-            prose-blockquote:border-l-purple-500 prose-blockquote:text-white/60 prose-blockquote:not-italic
-            prose-li:text-white/75 prose-li:marker:text-purple-400
+            prose-p:leading-[1.9]
+            prose-a:no-underline hover:prose-a:text-purple-200
+            prose-strong:font-semibold
+            prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+            prose-pre:border prose-pre:border-white/[0.07] prose-pre:rounded-xl
+            prose-blockquote:border-l-purple-500 prose-blockquote:not-italic
             prose-img:rounded-xl prose-img:shadow-[0_0_30px_rgba(0,0,0,0.5)]
-            prose-hr:border-white/[0.07]
-            prose-table:text-white/75
-            prose-th:text-white prose-th:border-white/[0.1]
-            prose-td:border-white/[0.07]
           "
           dangerouslySetInnerHTML={{ __html: article.html }}
         />
