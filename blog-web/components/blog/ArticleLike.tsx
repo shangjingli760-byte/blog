@@ -16,9 +16,13 @@ export default function ArticleLike({ slug, size = 'sm' }: Props) {
   useEffect(() => {
     const stored = localStorage.getItem(key);
     if (stored) {
-      const { liked: l, count: c } = JSON.parse(stored);
-      setLiked(l);
-      setCount(c);
+      try {
+        const { liked: l, count: c, v } = JSON.parse(stored);
+        // 旧数据无版本号则丢弃
+        if (v !== 1) { localStorage.removeItem(key); return; }
+        setLiked(l);
+        setCount(c);
+      } catch { localStorage.removeItem(key); }
     }
   }, [key]);
 
@@ -27,7 +31,7 @@ export default function ArticleLike({ slug, size = 'sm' }: Props) {
     const nextCount = next ? count + 1 : count - 1;
     setLiked(next);
     setCount(nextCount);
-    localStorage.setItem(key, JSON.stringify({ liked: next, count: nextCount }));
+    localStorage.setItem(key, JSON.stringify({ liked: next, count: nextCount, v: 1 }));
     if (next) {
       setBurst(true);
       setTimeout(() => setBurst(false), 600);

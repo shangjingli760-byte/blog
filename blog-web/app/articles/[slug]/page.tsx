@@ -134,7 +134,6 @@ export default async function ArticlePage({ params }: Props) {
         </BlurFade>
 
         {/* ===== 文章正文 ===== */}
-        <BlurFade delay={0.25}>
         <article
           className="
             prose prose-invert max-w-none
@@ -156,7 +155,6 @@ export default async function ArticlePage({ params }: Props) {
           "
           dangerouslySetInnerHTML={{ __html: article.html }}
         />
-        </BlurFade>
 
         {/* 底部分割线 */}
         <div className="mt-14 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
