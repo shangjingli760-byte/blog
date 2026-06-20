@@ -3,7 +3,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getAdminComments, deleteComment, type AdminComment } from '@/lib/adminApi';
-import { GlassContainer } from '@/components/effects/GlassContainer';
 
 export default function AdminCommentsPage() {
   const [comments, setComments] = useState<AdminComment[]>([]);
@@ -34,53 +33,48 @@ export default function AdminCommentsPage() {
 
   return (
     <div>
-      <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">评论管理</h2>
+      <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">评论管理</h2>
 
       {message && (
-        <GlassContainer
-          variant="strong"
-          className={`mb-6 px-4 py-3 ${message.includes('成功') ? 'bg-green-500/10 border-green-500/20' : 'bg-destructive/10 border-destructive/20'}`}
-        >
-          <p className={`text-sm ${message.includes('成功') ? 'text-green-400' : 'text-destructive'}`}>
-            {message}
-          </p>
-        </GlassContainer>
+        <div className={`mb-6 px-4 py-3 rounded-xl text-sm border ${message.includes('成功') ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+          {message}
+        </div>
       )}
 
       {loading ? (
-        <p className="text-muted-foreground">加载中...</p>
+        <p className="text-white/40">加载中...</p>
       ) : comments.length === 0 ? (
-        <GlassContainer variant="card" className="p-12 text-center">
-          <p className="text-muted-foreground">暂无评论</p>
-        </GlassContainer>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-12 text-center">
+          <p className="text-white/30">暂无评论</p>
+        </div>
       ) : (
-        <GlassContainer variant="card" className="overflow-hidden">
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-white/5 text-left text-foreground/80">
+            <thead className="bg-white/[0.04] text-left">
               <tr>
-                <th className="px-4 py-3 font-medium">昵称</th>
-                <th className="px-4 py-3 font-medium">邮箱</th>
-                <th className="px-4 py-3 font-medium">内容</th>
-                <th className="px-4 py-3 font-medium hidden md:table-cell">时间</th>
-                <th className="px-4 py-3 font-medium text-right">操作</th>
+                <th className="px-4 py-3 font-medium text-white/60">昵称</th>
+                <th className="px-4 py-3 font-medium text-white/60">邮箱</th>
+                <th className="px-4 py-3 font-medium text-white/60">内容</th>
+                <th className="px-4 py-3 font-medium text-white/60 hidden md:table-cell">时间</th>
+                <th className="px-4 py-3 font-medium text-white/60 text-right">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-white/[0.05]">
               {comments.map((c) => (
-                <tr key={c.id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-4 py-3 font-medium text-foreground">{c.nickname}</td>
-                  <td className="px-4 py-3 text-muted-foreground text-xs">{c.email}</td>
+                <tr key={c.id} className="hover:bg-white/[0.03] transition-colors">
+                  <td className="px-4 py-3 font-medium text-white/80">{c.nickname}</td>
+                  <td className="px-4 py-3 text-white/40 text-xs">{c.email}</td>
                   <td className="px-4 py-3">
-                    <p className="text-foreground/90 max-w-xs truncate">{c.content}</p>
-                    <span className="text-xs text-muted-foreground">文章 #{c.article_id}</span>
+                    <p className="text-white/70 max-w-xs truncate">{c.content}</p>
+                    <span className="text-xs text-white/25">文章 #{c.article_id}</span>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
+                  <td className="px-4 py-3 text-white/35 hidden md:table-cell">
                     {new Date(c.created_at).toLocaleDateString('zh-CN')}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => handleDelete(c.id)}
-                      className="text-destructive/70 hover:text-destructive text-sm transition-colors"
+                      className="text-red-400/70 hover:text-red-400 text-sm transition-colors"
                     >
                       删除
                     </button>
@@ -89,7 +83,7 @@ export default function AdminCommentsPage() {
               ))}
             </tbody>
           </table>
-        </GlassContainer>
+        </div>
       )}
     </div>
   );
