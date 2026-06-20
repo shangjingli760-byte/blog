@@ -130,7 +130,7 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
     <BlurFade delay={index * 0.06} inView>
       <Link
         href={`/articles/${article.slug}`}
-        className="relative group flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-2xl border border-white/[0.06] bg-white/[0.025] hover:bg-white/[0.05] hover:border-purple-500/20 transition-all duration-300 overflow-hidden"
+        className="relative group flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-2xl border border-white/[0.1] hover:border-purple-500/40 transition-all duration-300 overflow-hidden bg-[#0d0d18]"
       >
         {/* BorderBeam on hover */}
         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -139,10 +139,10 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
 
         {/* 左：日期纵列 */}
         <div className="shrink-0 flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0 sm:w-20 text-right">
-          <time className="text-2xl sm:text-3xl font-black text-white/10 group-hover:text-white/20 transition-colors leading-none">
+          <time className="text-2xl sm:text-3xl font-black text-white/20 group-hover:text-white/30 transition-colors leading-none">
             {new Date(article.created_at).getDate().toString().padStart(2, '0')}
           </time>
-          <div className="text-[11px] text-white/25 sm:leading-tight">
+          <div className="text-[11px] text-white/40 sm:leading-tight">
             <span className="block">{new Date(article.created_at).getFullYear()}</span>
             <span className="block">{new Date(article.created_at).toLocaleDateString('zh-CN', { month: 'short' })}</span>
           </div>
@@ -157,7 +157,7 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
             {article.title}
           </h2>
           {article.summary && (
-            <p className="text-sm text-white/35 group-hover:text-white/45 transition-colors line-clamp-2 leading-relaxed mb-3">
+            <p className="text-sm text-white/50 group-hover:text-white/65 transition-colors line-clamp-2 leading-relaxed mb-3">
               {article.summary}
             </p>
           )}
@@ -165,7 +165,7 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
             {tagArray.map(tag => (
               <span
                 key={tag}
-                className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/35 group-hover:border-purple-500/30 group-hover:text-purple-300/60 transition-all"
+                className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/[0.05] border border-white/[0.08] text-white/50 group-hover:border-purple-500/40 group-hover:text-purple-300/80 transition-all"
               >
                 {tag}
               </span>
@@ -174,7 +174,7 @@ function ArticleRow({ article, index }: { article: Article; index: number }) {
         </div>
 
         {/* 箭头 */}
-        <div className="shrink-0 self-center text-white/15 group-hover:text-purple-400 group-hover:translate-x-1 transition-all duration-300">
+        <div className="shrink-0 self-center text-white/30 group-hover:text-purple-400 group-hover:translate-x-1 transition-all duration-300">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>

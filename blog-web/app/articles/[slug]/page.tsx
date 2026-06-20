@@ -126,7 +126,6 @@ export default async function ArticlePage({ params }: Props) {
                   <time>{dateStr}</time>
                 </div>
               </div>
-              <ArticleLike slug={params.slug} />
             </div>
 
             {/* 分割线 */}
