@@ -19,11 +19,6 @@ export default function ArticleLike({ slug, size = 'sm' }: Props) {
       const { liked: l, count: c } = JSON.parse(stored);
       setLiked(l);
       setCount(c);
-    } else {
-      // 随机初始点赞数（让页面看起来有人气）
-      const init = Math.floor(Math.random() * 60) + 5;
-      setCount(init);
-      localStorage.setItem(key, JSON.stringify({ liked: false, count: init }));
     }
   }, [key]);
 
