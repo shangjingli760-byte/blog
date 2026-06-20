@@ -3,6 +3,85 @@
 import { useState } from 'react';
 import { useComments } from '@/hooks/useComments';
 
+/* ---- 单条评论 ---- */
+function CommentCard({ c }: { c: { id: number; nickname: string; content: string; created_at: string } }) {
+  return (
+    <div className="group relative flex gap-4 py-5 border-b border-white/[0.05] last:border-0">
+      <div
+        className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white/70"
+        style={{ background: `linear-gradient(135deg, hsl(${(c.nickname.charCodeAt(0) * 37) % 360},60%,35%), hsl(${(c.nickname.charCodeAt(0) * 37 + 120) % 360},60%,25%))` }}
+      >
+        {c.nickname.charAt(0).toUpperCase()}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-3 mb-1.5">
+          <span className="text-sm font-semibold text-white/80">{c.nickname}</span>
+          <time className="text-[11px] text-white/25">
+            {new Date(c.created_at).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })}
+          </time>
+        </div>
+        <p className="text-sm text-white/55 leading-relaxed whitespace-pre-wrap">{c.content}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ---- 输入框 ---- */
+function CommentField({
+  id, label, type = 'text', value, onChange, rows, focused, onFocus, onBlur,
+}: {
+  id: string; label: string; type?: string; value: string;
+  onChange: (v: string) => void; rows?: number;
+  focused: string | null; onFocus: (id: string) => void; onBlur: () => void;
+}) {
+  const isFocused = focused === id;
+  const isActive = isFocused || value.length > 0;
+  const base =
+    'w-full bg-white/[0.03] border rounded-xl px-4 text-sm text-white/80 placeholder-transparent focus:outline-none transition-all duration-200';
+  const borderClass = isFocused
+    ? 'border-purple-500/50 shadow-[0_0_0_3px_rgba(168,85,247,0.12)]'
+    : 'border-white/[0.07] hover:border-white/[0.12]';
+
+  return (
+    <div className="relative">
+      <label
+        htmlFor={id}
+        className={`absolute left-4 pointer-events-none transition-all duration-200 ${
+          isActive
+            ? '-top-2 text-[10px] tracking-widest uppercase text-purple-400/70 bg-[#0d0d14] px-1'
+            : 'top-1/2 -translate-y-1/2 text-sm text-white/25'
+        } ${rows ? 'top-3.5 translate-y-0' : ''}`}
+        style={isActive && rows ? { top: '-0.5rem', transform: 'none' } : undefined}
+      >
+        {label}
+      </label>
+      {rows ? (
+        <textarea
+          id={id}
+          rows={rows}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onFocus={() => onFocus(id)}
+          onBlur={onBlur}
+          placeholder={label}
+          className={`${base} ${borderClass} pt-4 pb-3 resize-none`}
+        />
+      ) : (
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onFocus={() => onFocus(id)}
+          onBlur={onBlur}
+          placeholder={label}
+          className={`${base} ${borderClass} py-3`}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function CommentSection({ slug }: { slug: string }) {
   const { comments, loading, submitComment } = useComments(slug);
   const [nickname, setNickname] = useState('');
@@ -32,87 +111,8 @@ export default function CommentSection({ slug }: { slug: string }) {
     }
   };
 
-  /* ---- 单条评论 ---- */
-  const CommentCard = ({ c }: { c: typeof comments[0] }) => (
-    <div className="group relative flex gap-4 py-5 border-b border-white/[0.05] last:border-0">
-      {/* 头像 */}
-      <div
-        className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white/70"
-        style={{ background: `linear-gradient(135deg, hsl(${(c.nickname.charCodeAt(0) * 37) % 360},60%,35%), hsl(${(c.nickname.charCodeAt(0) * 37 + 120) % 360},60%,25%))` }}
-      >
-        {c.nickname.charAt(0).toUpperCase()}
-      </div>
-
-      {/* 内容 */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-3 mb-1.5">
-          <span className="text-sm font-semibold text-white/80">{c.nickname}</span>
-          <time className="text-[11px] text-white/25">
-            {new Date(c.created_at).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })}
-          </time>
-        </div>
-        <p className="text-sm text-white/55 leading-relaxed whitespace-pre-wrap">{c.content}</p>
-      </div>
-    </div>
-  );
-
-  /* ---- 输入框 ---- */
-  const Field = ({
-    id, label, type = 'text', value, onChange, rows,
-  }: {
-    id: string; label: string; type?: string; value: string;
-    onChange: (v: string) => void; rows?: number;
-  }) => {
-    const isActive = focused === id || value.length > 0;
-    const base =
-      'w-full bg-white/[0.03] border rounded-xl px-4 text-sm text-white/80 placeholder-transparent focus:outline-none transition-all duration-200';
-    const borderClass = focused === id
-      ? 'border-purple-500/50 shadow-[0_0_0_3px_rgba(168,85,247,0.12)]'
-      : 'border-white/[0.07] hover:border-white/[0.12]';
-
-    return (
-      <div className="relative">
-        <label
-          htmlFor={id}
-          className={`absolute left-4 pointer-events-none transition-all duration-200 ${
-            isActive
-              ? '-top-2 text-[10px] tracking-widest uppercase text-purple-400/70 bg-[#0d0d14] px-1'
-              : 'top-1/2 -translate-y-1/2 text-sm text-white/25'
-          } ${rows ? 'top-3.5 translate-y-0' : ''}`}
-          style={isActive && rows ? { top: '-0.5rem', transform: 'none' } : {}}
-        >
-          {label}
-        </label>
-        {rows ? (
-          <textarea
-            id={id}
-            rows={rows}
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            onFocus={() => setFocused(id)}
-            onBlur={() => setFocused(null)}
-            placeholder={label}
-            className={`${base} ${borderClass} pt-4 pb-3 resize-none`}
-          />
-        ) : (
-          <input
-            id={id}
-            type={type}
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            onFocus={() => setFocused(id)}
-            onBlur={() => setFocused(null)}
-            placeholder={label}
-            className={`${base} ${borderClass} py-3`}
-          />
-        )}
-      </div>
-    );
-  };
-
   return (
     <section className="mt-12">
-      {/* 标题 */}
       <div className="flex items-center gap-3 mb-8">
         <span className="inline-block w-5 h-px bg-purple-500" />
         <h2 className="text-lg font-semibold text-white/70 tracking-wide">
@@ -121,11 +121,7 @@ export default function CommentSection({ slug }: { slug: string }) {
         </h2>
       </div>
 
-      {/* 评论列表 */}
-      <div
-        className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden mb-8"
-        style={{ display: loading || comments.length === 0 ? 'block' : 'block' }}
-      >
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden mb-8">
         {loading ? (
           <div className="p-8 space-y-4">
             {[...Array(2)].map((_, i) => (
@@ -151,16 +147,15 @@ export default function CommentSection({ slug }: { slug: string }) {
         )}
       </div>
 
-      {/* 发表评论表单 */}
       <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-6 md:p-8">
         <p className="text-xs tracking-[0.25em] uppercase text-white/25 mb-6">发表评论</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field id="nickname" label="昵称 *" value={nickname} onChange={setNickname} />
-            <Field id="email" label="邮箱 *" type="email" value={email} onChange={setEmail} />
+            <CommentField id="nickname" label="昵称 *" value={nickname} onChange={setNickname} focused={focused} onFocus={setFocused} onBlur={() => setFocused(null)} />
+            <CommentField id="email" label="邮箱 *" type="email" value={email} onChange={setEmail} focused={focused} onFocus={setFocused} onBlur={() => setFocused(null)} />
           </div>
-          <Field id="content" label="写下你的想法…" value={content} onChange={setContent} rows={4} />
+          <CommentField id="content" label="写下你的想法…" value={content} onChange={setContent} rows={4} focused={focused} onFocus={setFocused} onBlur={() => setFocused(null)} />
 
           {flash && (
             <div className={`px-4 py-2.5 rounded-xl text-sm ${flash.ok ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
